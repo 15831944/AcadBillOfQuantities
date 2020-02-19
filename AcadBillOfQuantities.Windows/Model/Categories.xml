@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Settings>
+  <Category Name="Fundamenty">
+    <SubCategory Name="Podkłady betonowe">
+      <SubCategory Name="pod ławy i stopy"/>
+      <SubCategory Name="pod płyty posadzek"/>
+    </SubCategory>
+    <SubCategory Name="Ławy fundamentowe"/>
+    <SubCategory Name="Stopy fundamentowe"/>
+  </Category>
+</Settings>
