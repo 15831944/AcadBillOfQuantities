@@ -11,14 +11,19 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using System.Windows;
 using System.Windows.Forms;
+using AcadBillOfQuantities.UI;
+using AcadBillOfQuantities.UI.Model;
+using AcadBillOfQuantities.UI.ViewModel;
+using CommonServiceLocator;
+using GalaSoft.MvvmLight.Ioc;
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
 
-[assembly: CommandClass(typeof(AcadBillOfQuantities.Core.Class1))]
+[assembly: CommandClass(typeof(AcadBillOfQuantities.Core.AcadCommands))]
 
 namespace AcadBillOfQuantities.Core
 {
-    public class Class1
+    public class AcadCommands
     {
         //[CommandMethod("GetPointsFromUser")]
         public static void GetPointsFromUser()
@@ -165,7 +170,7 @@ namespace AcadBillOfQuantities.Core
         }
 
         [CommandMethod("GetTotalLength", CommandFlags.UsePickSet)]
-        public void GetTotalLength()
+        public static void GetTotalLength()
         {
             // Get the current document
             var acDocument = Application.DocumentManager.MdiActiveDocument;
@@ -211,7 +216,7 @@ namespace AcadBillOfQuantities.Core
                     Application.ShowAlertDialog(userInfoContetnt);
                     acDocument.Editor.WriteMessage(userInfoContetnt);
 
-                    Clipboard.SetText(totalLength.ToString(CultureInfo.InvariantCulture));
+                    System.Windows.Clipboard.SetText(totalLength.ToString(CultureInfo.InvariantCulture));
                 }
             }
             else
@@ -268,7 +273,7 @@ namespace AcadBillOfQuantities.Core
                     Application.ShowAlertDialog(userInfoContetnt);
                     acDocument.Editor.WriteMessage(userInfoContetnt);
 
-                    Clipboard.SetText(totalArea.ToString(CultureInfo.InvariantCulture));
+                    System.Windows.Clipboard.SetText(totalArea.ToString(CultureInfo.InvariantCulture));
                 }
             }
             else
@@ -310,6 +315,31 @@ namespace AcadBillOfQuantities.Core
                 }
 
                 // Dispose of the transaction
+            }
+        }
+
+        [CommandMethod("StartAcadBillOfQuantitiesApp")]
+        public static void StartAcadBillOfQuantitiesApp()
+        {
+            ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
+            SimpleIoc.Default.Register<IGetTotalLengthCommand, GetTotalLengthCommand>();
+            //var app = System.Windows.Application.Current ?? new System.Windows.Application();
+            //app.Resources.Add("Locator", new ViewModelLocator());
+            var window = new MainWindow()
+            {
+                DataContext = new ViewModelLocator().Main,
+                Topmost = true
+            };
+            //window.Resources.Add("Locator", new ViewModelLocator());
+            window.Show();
+        }
+
+
+        public class GetTotalLengthCommand : IGetTotalLengthCommand
+        {
+            public void Execute()
+            {
+                AcadCommands.GetTotalLength();
             }
         }
     }

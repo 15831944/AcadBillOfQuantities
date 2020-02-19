@@ -2,9 +2,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using GalaSoft.MvvmLight;
 using System.IO;
+using System.Windows.Input;
 using System.Xml.Serialization;
 using AcadBillOfQuantities.UI.Model;
 using System.Xml;
+using GalaSoft.MvvmLight.CommandWpf;
+using GalaSoft.MvvmLight.Ioc;
 
 namespace AcadBillOfQuantities.UI.ViewModel
 {
@@ -23,6 +26,7 @@ namespace AcadBillOfQuantities.UI.ViewModel
     public class MainViewModel : ViewModelBase
     {
         public ObservableCollection<Category> Categories { get; set; }
+        public ICommand ExecuteAcadCommand { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -35,6 +39,7 @@ namespace AcadBillOfQuantities.UI.ViewModel
             }
             else
             {
+                ExecuteAcadCommand = new RelayCommand(SimpleIoc.Default.GetInstance<IGetTotalLengthCommand>().Execute);
                 string thisDir = Directory.GetCurrentDirectory();
                 string configFilePath = Path.Combine(thisDir, "AppSettings.xml");
 

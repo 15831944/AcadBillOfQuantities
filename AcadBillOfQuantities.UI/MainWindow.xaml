@@ -5,9 +5,126 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AcadBillOfQuantities.UI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
-        DataContext="{Binding Main, Source={StaticResource Locator}}">
+        Title="MainWindow" Height="450" Width="200">
+    <!--DataContext="{Binding Main, Source={StaticResource Locator}}"-->
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
 
+        <StackPanel Orientation="Horizontal">
+            <Button Content="Expand all" Command="{Binding ExecuteAcadCommand}"></Button>
+            <Button Content="Copy to clipboard"></Button>
+        </StackPanel>
+        <TreeView Grid.Row="1" Name="Categories">
+            <TreeViewItem >
+                <TreeViewItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Visibility="Visible">1</Button>
+                        <TextBlock Text="Fundamenty"></TextBlock>
+                        <Button Content="Info"></Button>
+                    </StackPanel>
+                </TreeViewItem.Header>
+                <TreeViewItem>
+                    <TreeViewItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Ławy"></TextBlock>
+                                <RadioButton></RadioButton>
+                                <Button Content="Info"></Button>
+                            </StackPanel>
+                    </TreeViewItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="White" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                        <CheckBox Margin="5,0,5,0"></CheckBox>
+                        <TextBlock Text="1"/>
+                        <Button Content="Info"/>
+                        <Button Content="Delete"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="White" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                        <CheckBox Margin="5,0,5,0"></CheckBox>
+                        <TextBlock Text="2"/>
+                        <Button Content="Info"/>
+                        <Button Content="Delete"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="White" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                        <CheckBox Margin="5,0,5,0"></CheckBox>
+                        <TextBlock Text="3"/>
+                        <Button Content="Info"/>
+                        <Button Content="Delete"/>
+                    </StackPanel>
+                </TreeViewItem>
+            </TreeViewItem>
+            <TreeViewItem>
+                <TreeViewItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Wykopy"></TextBlock>
+                            <Button Content="Info"></Button>
+                        </StackPanel>
+                </TreeViewItem.Header>
+                <TreeViewItem>
+                    <TreeViewItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Opaska"></TextBlock>
+                                <RadioButton></RadioButton>
+                                <Button Content="Info"></Button>
+                            </StackPanel>
+                    </TreeViewItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="White" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                        <CheckBox Margin="5,0,5,0"></CheckBox>
+                        <TextBlock Text="1"/>
+                        <Button Content="Info"/>
+                        <Button Content="Delete"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="White" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                        <CheckBox Margin="5,0,5,0"></CheckBox>
+                        <TextBlock Text="2"/>
+                        <Button Content="Info"/>
+                        <Button Content="Delete"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="White" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                        <CheckBox Margin="5,0,5,0"></CheckBox>
+                        <TextBlock Text="3"/>
+                        <Button Content="Info"/>
+                        <Button Content="Delete"/>
+                    </StackPanel>
+                </TreeViewItem>
+                <TreeViewItem>
+                    <TreeViewItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Studnie"></TextBlock>
+                                <RadioButton></RadioButton>
+                                <Button Content="Info"></Button>
+                            </StackPanel>
+                    </TreeViewItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="White" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                        <CheckBox Margin="5,0,5,0"></CheckBox>
+                        <TextBlock Text="1"/>
+                        <Button Content="Info"/>
+                        <Button Content="Delete"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="White" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                        <CheckBox Margin="5,0,5,0"></CheckBox>
+                        <TextBlock Text="2"/>
+                        <Button Content="Info"/>
+                        <Button Content="Delete"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Fill="White" Stroke="Black" StrokeThickness="1" Width="8" Height="8"/>
+                        <CheckBox Margin="5,0,5,0"></CheckBox>
+                        <TextBlock Text="3"/>
+                        <Button Content="Info"/>
+                        <Button Content="Delete"/>
+                    </StackPanel>
+                </TreeViewItem>
+            </TreeViewItem>
+        </TreeView>
     </Grid>
 </Window>
