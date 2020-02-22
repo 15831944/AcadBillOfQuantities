@@ -24,6 +24,23 @@ namespace AcadBillOfQuantities.UI.ViewModel
     /// </summary>
     public class ViewModelLocator
     {
+        private static ViewModelLocator _viewModelLocator;
+        public static ViewModelLocator Instance
+        {
+            get
+            {
+                object syncRoot = new object();
+                lock (syncRoot)
+                {
+                    if (_viewModelLocator == null)
+                    {
+                        _viewModelLocator = new ViewModelLocator();
+                    }
+                }
+                return _viewModelLocator;
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of the ViewModelLocator class.
         /// </summary>

@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:AcadBillOfQuantities.UI"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="200">
-    <!--DataContext="{Binding Main, Source={StaticResource Locator}}"-->
+        <!--Title="MainWindow" Height="450" Width="200"
+        DataContext="{Binding Main, Source={StaticResource Locator}}">-->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"></RowDefinition>

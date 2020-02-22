@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
+using AcadBillOfQuantities.UI.ViewModel;
 
 namespace AcadBillOfQuantities.UI
 {
@@ -23,6 +26,20 @@ namespace AcadBillOfQuantities.UI
         public MainWindow()
         {
             InitializeComponent();
+            // Handle closing event to hide window instead of closing it
+
+            Closing += delegate (object sender, CancelEventArgs e)
+            {
+                e.Cancel = true;
+                this.Dispatcher.BeginInvoke(DispatcherPriority.Background,
+                (DispatcherOperationCallback)(arg =>
+                {
+                    Hide();
+                    return null;
+                }), null);
+            };
+
+            DataContext = ViewModelLocator.Instance;
         }
     }
 }

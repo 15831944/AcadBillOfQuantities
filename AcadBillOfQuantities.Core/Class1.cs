@@ -294,7 +294,7 @@ namespace AcadBillOfQuantities.Core
                 // Returns the layer table for the current database
                 LayerTable acLyrTbl;
                 acLyrTbl = acTrans.GetObject(acCurDb.LayerTableId,
-                                             OpenMode.ForRead) as LayerTable;
+                    OpenMode.ForRead) as LayerTable;
 
                 // Check to see if MyLayer exists in the Layer table
                 if (acLyrTbl.Has("MyLayer") != true)
@@ -318,22 +318,87 @@ namespace AcadBillOfQuantities.Core
             }
         }
 
+        private static object syncRoot = new object();
+        private static UI.App _boqApp;
+
+        public static UI.App BoqApp
+        {
+            get
+            {
+                lock (syncRoot)
+                {
+                    if (_boqApp == null)
+                        _boqApp = new UI.App();
+                    _boqApp.InitializeComponent();
+                }
+
+                return _boqApp;
+            }
+        }
+
+        private static ViewModelLocator _viewModelLocator;
+        public static ViewModelLocator ViewModelLocatorInstance
+        {
+            get
+            {
+                lock (syncRoot)
+                {
+                    if (_viewModelLocator == null)
+                    {
+                        //ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
+                        SimpleIoc.Default.Register<IGetTotalLengthCommand, GetTotalLengthCommand>();
+                        _viewModelLocator = new ViewModelLocator();
+                    }
+                }
+                return _viewModelLocator;
+            }
+        }
+
+        private static MainWindow _mainWindow;
+        public static MainWindow MainWindow
+        {
+            get
+            {
+                lock (syncRoot)
+                {
+                    if (_mainWindow == null)
+                    {
+                        _mainWindow = new MainWindow()
+                        {
+                            DataContext = AcadCommands.ViewModelLocatorInstance.Main,
+                            Topmost = true
+                        };
+                    }
+                }
+                return _mainWindow;
+            }
+        }
+
+
+        private static UI.App _uiApp;
+        public static UI.App UiApp
+        {
+            get
+            {
+                lock (syncRoot)
+                {
+                    if (_uiApp == null)
+                    {
+                        _uiApp = new UI.App();
+                        _uiApp.Resources.Add("Locator", ViewModelLocatorInstance);
+                    }
+                }
+                return _uiApp;
+            }
+        }
+
+
         [CommandMethod("StartAcadBillOfQuantitiesApp")]
         public static void StartAcadBillOfQuantitiesApp()
         {
-            ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
-            SimpleIoc.Default.Register<IGetTotalLengthCommand, GetTotalLengthCommand>();
-            //var app = System.Windows.Application.Current ?? new System.Windows.Application();
-            //app.Resources.Add("Locator", new ViewModelLocator());
-            var window = new MainWindow()
-            {
-                DataContext = new ViewModelLocator().Main,
-                Topmost = true
-            };
-            //window.Resources.Add("Locator", new ViewModelLocator());
-            window.Show();
+            //UiApp.MainWindow.Show();
+            MainWindow.Show();
         }
-
 
         public class GetTotalLengthCommand : IGetTotalLengthCommand
         {
