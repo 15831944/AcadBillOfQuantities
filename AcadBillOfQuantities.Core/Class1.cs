@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -14,9 +15,11 @@ using System.Windows.Forms;
 using AcadBillOfQuantities.UI;
 using AcadBillOfQuantities.UI.Model;
 using AcadBillOfQuantities.UI.ViewModel;
+using Autodesk.AutoCAD.GraphicsInterface;
 using CommonServiceLocator;
 using GalaSoft.MvvmLight.Ioc;
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
+using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
 
 
 [assembly: CommandClass(typeof(AcadBillOfQuantities.Core.AcadCommands))]
@@ -282,6 +285,140 @@ namespace AcadBillOfQuantities.Core
             }
         }
 
+        [CommandMethod("CountPolylinesInLayer")]
+        public static void CountPolylinesIn(string layerName = null)
+        {
+            // Get the current document
+            var acDocument = Application.DocumentManager.MdiActiveDocument;
+
+            if (string.IsNullOrEmpty(layerName))
+            {
+                PromptStringOptions pStrOpts = new PromptStringOptions("\nEnter your name: ");
+                pStrOpts.AllowSpaces = true;
+                PromptResult pStrRes = acDocument.Editor.GetString(pStrOpts);
+
+                layerName = pStrRes.StringResult;
+            }
+
+            // Get the current document and database, and start a transaction
+            Database acCurDb = acDocument.Database;
+
+            double totalLength = default;
+            using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
+            {
+                int nCnt = 0;
+
+                // Open the Block table record for read
+                BlockTable acBlkTbl;
+                acBlkTbl = acTrans.GetObject(acCurDb.BlockTableId,
+                                             OpenMode.ForRead) as BlockTable;
+
+                // Open the Block table record Model space for read
+                BlockTableRecord acBlkTblRec;
+                acBlkTblRec = acTrans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
+                                                OpenMode.ForRead) as BlockTableRecord;
+
+                acDocument.Editor.WriteMessage("\nModel space objects: ");
+
+                // Step through each object in Model space and
+                // display the type of object found
+                foreach (ObjectId acObjId in acBlkTblRec)
+                {
+                    //acDocument.Editor.WriteMessage("\n" + acObjId.ObjectClass.DxfName);
+                    var pline = acTrans.GetObject(acObjId, OpenMode.ForRead) as Polyline;
+                    if (!(pline is null) && pline.Layer == layerName)
+                    {
+                        //totalLength += pline.Length;
+                        nCnt++;
+                    }
+                }
+
+                string userInfoContetnt = $"\nSummed polylines: {nCnt}" +
+                                          $"\nTotal Length: {totalLength}" +
+                                          $"\nTotal length is copied to clipboard." +
+                                          $"\nUse Paste command (Ctrl+V) to place vale.";
+
+                Application.ShowAlertDialog(nCnt.ToString());
+                acDocument.Editor.WriteMessage(nCnt.ToString());
+
+                System.Windows.Clipboard.SetText(totalLength.ToString(CultureInfo.InvariantCulture));
+            }
+        }
+
+        public class PlineCollection
+        {
+            public int Count { get; set; }
+            public double Length { get; set; }
+            public double Area { get; set; }
+
+            public PlineCollection()
+            {
+                Count = default;
+                Length = default;
+                Area = default;
+            }
+        }
+
+        [CommandMethod("CountPolylines")]
+        public static void CountPolylines()
+        {
+            AcadCommands.ResultDictionary = new Dictionary<string, (int count, double length, double area)>();
+            // Get the current document
+            var acDocument = Application.DocumentManager.MdiActiveDocument;
+
+            // Get the current document and database, and start a transaction
+            Database acCurDb = acDocument.Database;
+
+            double totalLength = default;
+            using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
+            {
+                int nCnt = 0;
+
+                // Open the Block table record for read
+                BlockTable acBlkTbl;
+                acBlkTbl = acTrans.GetObject(acCurDb.BlockTableId,
+                                             OpenMode.ForRead) as BlockTable;
+
+                // Open the Block table record Model space for read
+                BlockTableRecord acBlkTblRec;
+                acBlkTblRec = acTrans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
+                                                OpenMode.ForRead) as BlockTableRecord;
+
+                acDocument.Editor.WriteMessage("\nModel space objects: ");
+
+                // Step through each object in Model space and
+                // display the type of object found
+                foreach (ObjectId acObjId in acBlkTblRec)
+                {
+                    //acDocument.Editor.WriteMessage("\n" + acObjId.ObjectClass.DxfName);
+                    var pline = acTrans.GetObject(acObjId, OpenMode.ForRead) as Polyline;
+                    if (!(pline is null))
+                    {
+                        if (!AcadCommands.ResultDictionary.ContainsKey(pline.Layer))
+                            AcadCommands.ResultDictionary.Add(pline.Layer, (default, default, default));
+                        var current = AcadCommands.ResultDictionary[pline.Layer];
+                        var updated =
+                            (current.count += 1, current.length += pline.Length, current.area += pline.Area);
+                        AcadCommands.ResultDictionary[pline.Layer] = updated;
+                    }
+                }
+
+                string userInfo = "Count of polylines per layer:\r\n";
+                foreach (var entry in AcadCommands.ResultDictionary)
+                {
+                    userInfo += $"In layer \"{entry.Key}\" count: {entry.Value.count}, " +
+                                $"sum length: {entry.Value.length}, sum area: {entry.Value.area}\r\n";
+                }
+
+                Application.ShowAlertDialog(userInfo);
+                acDocument.Editor.WriteMessage(userInfo);
+
+                System.Windows.Clipboard.SetText(totalLength.ToString(CultureInfo.InvariantCulture));
+            }
+        }
+
+        public static Dictionary<string, (int count, double length, double area)> ResultDictionary { get; set; }
+
         [CommandMethod("AddMyLayer")]
         public static void AddMyLayer(string layerName = null)
         {
@@ -363,8 +500,6 @@ namespace AcadBillOfQuantities.Core
         {
             Document acDoc = Application.DocumentManager.MdiActiveDocument;
 
-            // Draws a circle and zooms to the extents or
-            // limits of the drawing
             acDoc.SendStringToExecute(acadCommandString, true, false, false);
         }
 
@@ -399,6 +534,7 @@ namespace AcadBillOfQuantities.Core
                         SimpleIoc.Default.Reset();
                         SimpleIoc.Default.Register<IGetTotalLengthCommand, GetTotalLengthCommand>();
                         SimpleIoc.Default.Register<ICreateCategoryPolyline, CreateCategoryPolyline>();
+                        SimpleIoc.Default.Register<IGetPlineCollectionsCommand, GetPlineCollectionsCommand>();
                         _viewModelLocator = new ViewModelLocator();
                     }
                 }
@@ -467,6 +603,15 @@ namespace AcadBillOfQuantities.Core
                 AcadCommands.AddMyLayer(layerName);
                 AcadCommands.SetLayerCurrent(layerName);
                 AcadCommands.SendACommandToAutoCAD("PLINE ");
+            }
+        }
+
+        public class GetPlineCollectionsCommand : IGetPlineCollectionsCommand
+        {
+            public Dictionary<string, (int count, double length, double area)> Execute(IEnumerable<string> arg)
+            {
+                AcadCommands.CountPolylines();
+                return AcadCommands.ResultDictionary;
             }
         }
     }

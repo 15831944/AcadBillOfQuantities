@@ -20,7 +20,7 @@
 
         <StackPanel Orientation="Horizontal">
             <Button Content="Expand all" Command="{Binding ExecuteAcadCommand}"></Button>
-            <Button Content="Copy to clipboard"></Button>
+            <Button Content="Copy to clipboard" Command="{Binding GetPolylinesData}"></Button>
         </StackPanel>
         <TreeView Grid.Row="1" Name="Categories" ItemsSource="{Binding Categories}">
             <TreeView.Resources>

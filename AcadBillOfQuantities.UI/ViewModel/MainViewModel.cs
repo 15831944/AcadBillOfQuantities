@@ -28,6 +28,7 @@ namespace AcadBillOfQuantities.UI.ViewModel
         public ObservableCollection<Category> Categories { get; set; }
         public ICommand ExecuteAcadCommand { get; private set; }
         public ICommand AddCategoryPolylineCommand { get; private set; }
+        public ICommand GetPolylinesData { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -42,6 +43,8 @@ namespace AcadBillOfQuantities.UI.ViewModel
             {
                 AddCategoryPolylineCommand = new RelayCommand<string>(
                     layerName => CreateCategoryPolyline(layerName));
+                GetPolylinesData = new RelayCommand<IEnumerable<string>>(
+                    layerNames => GetPolylinesDataFromAcad(layerNames));
                 try
                 {
                     ExecuteAcadCommand = new RelayCommand(
@@ -66,6 +69,15 @@ namespace AcadBillOfQuantities.UI.ViewModel
             try
             {
                 SimpleIoc.Default.GetInstance<ICreateCategoryPolyline>().Execute(layerName);
+            } catch { }
+        }
+
+        private void GetPolylinesDataFromAcad(IEnumerable<string> layersToGet = null)
+        {
+            try
+            {
+                var receivedData = SimpleIoc.Default.GetInstance<IGetPlineCollectionsCommand>()
+                    .Execute(layersToGet);
             } catch { }
         }
 

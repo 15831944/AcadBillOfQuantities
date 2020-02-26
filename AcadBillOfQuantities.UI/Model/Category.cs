@@ -12,6 +12,9 @@ namespace AcadBillOfQuantities.UI.Model
     {
         public string Name { get; set; }
         public string LayerName { get; set; }
+        public int Count { get; set; }
+        public double SumLength { get; set; }
+        public double SumArea { get; set; }
         //public char ShortcutKey { get; set; }
         public ObservableCollection<Category> Categories { get; set; }
 
