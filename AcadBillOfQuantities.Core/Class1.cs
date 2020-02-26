@@ -369,7 +369,6 @@ namespace AcadBillOfQuantities.Core
             // Get the current document and database, and start a transaction
             Database acCurDb = acDocument.Database;
 
-            double totalLength = default;
             using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
             {
                 int nCnt = 0;
@@ -404,16 +403,21 @@ namespace AcadBillOfQuantities.Core
                 }
 
                 string userInfo = "Count of polylines per layer:\r\n";
+                userInfo += "Category\tCount\tLength\tArea\r\n";
                 foreach (var entry in AcadCommands.ResultDictionary)
                 {
+                    userInfo += $"{entry.Key}\t{entry.Value.count}\t" +
+                                $"{entry.Value.length}\t{entry.Value.area}\r\n";
+                    /*
                     userInfo += $"In layer \"{entry.Key}\" count: {entry.Value.count}, " +
                                 $"sum length: {entry.Value.length}, sum area: {entry.Value.area}\r\n";
+                                */
                 }
 
                 Application.ShowAlertDialog(userInfo);
                 acDocument.Editor.WriteMessage(userInfo);
 
-                System.Windows.Clipboard.SetText(totalLength.ToString(CultureInfo.InvariantCulture));
+                System.Windows.Clipboard.SetText(userInfo);
             }
         }
 
