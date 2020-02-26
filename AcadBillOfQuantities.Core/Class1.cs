@@ -283,39 +283,89 @@ namespace AcadBillOfQuantities.Core
         }
 
         [CommandMethod("AddMyLayer")]
-        public static void AddMyLayer()
+        public static void AddMyLayer(string layerName = null)
         {
+            layerName = layerName ?? "_BOQ_Main";
             // Get the current document and database, and start a transaction
             Document acDoc = Application.DocumentManager.MdiActiveDocument;
             Database acCurDb = acDoc.Database;
 
-            using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
+            // Lock the new document
+            using (DocumentLock acLckDoc = acDoc.LockDocument())
             {
-                // Returns the layer table for the current database
-                LayerTable acLyrTbl;
-                acLyrTbl = acTrans.GetObject(acCurDb.LayerTableId,
-                    OpenMode.ForRead) as LayerTable;
-
-                // Check to see if MyLayer exists in the Layer table
-                if (acLyrTbl.Has("MyLayer") != true)
+                using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
                 {
-                    // Open the Layer Table for write
-                    acLyrTbl.UpgradeOpen();
+                    // Returns the layer table for the current database
+                    LayerTable acLyrTbl;
+                    acLyrTbl = acTrans.GetObject(acCurDb.LayerTableId,
+                        OpenMode.ForRead) as LayerTable;
 
-                    // Create a new layer table record and name the layer "MyLayer"
-                    LayerTableRecord acLyrTblRec = new LayerTableRecord();
-                    acLyrTblRec.Name = "MyLayer";
+                    // Check to see if MyLayer exists in the Layer table
+                    if (acLyrTbl.Has(layerName) != true)
+                    {
 
-                    // Add the new layer table record to the layer table and the transaction
-                    acLyrTbl.Add(acLyrTblRec);
-                    acTrans.AddNewlyCreatedDBObject(acLyrTblRec, true);
+                        // Open the Layer Table for write
+                        acLyrTbl.UpgradeOpen();
+                        // Create a new layer table record and name the layer "MyLayer"
+                        LayerTableRecord acLyrTblRec = new LayerTableRecord();
+                        acLyrTblRec.Name = layerName;
 
-                    // Commit the changes
-                    acTrans.Commit();
+                        // Add the new layer table record to the layer table and the transaction
+                        acLyrTbl.Add(acLyrTblRec);
+                        acTrans.AddNewlyCreatedDBObject(acLyrTblRec, true);
+
+                        // Commit the changes
+                        acTrans.Commit();
+                    }
+
+                    // Dispose of the transaction
                 }
-
-                // Dispose of the transaction
             }
+        }
+
+        [CommandMethod("SetLayerCurrent")]
+        public static void SetLayerCurrent(string layerName = null)
+        {
+            layerName = layerName ?? "_BOQ_Main";
+            // Get the current document and database
+            Document acDoc = Application.DocumentManager.MdiActiveDocument;
+            Database acCurDb = acDoc.Database;
+
+            // Lock the new document
+            using (DocumentLock acLckDoc = acDoc.LockDocument())
+            {
+                // Start a transaction
+                using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
+                {
+                    // Open the Layer table for read
+                    LayerTable acLyrTbl;
+                    acLyrTbl = acTrans.GetObject(acCurDb.LayerTableId,
+                        OpenMode.ForRead) as LayerTable;
+
+
+                    if (acLyrTbl.Has(layerName) == true)
+                    {
+                        // Set the layer Center current
+                        acCurDb.Clayer = acLyrTbl[layerName];
+
+                        // Save the changes
+                        acTrans.Commit();
+                    }
+
+                    // Dispose of the transaction
+                }
+            }
+        }
+
+
+        [CommandMethod("SendACommandToAutoCAD")]
+        public static void SendACommandToAutoCAD(string acadCommandString)
+        {
+            Document acDoc = Application.DocumentManager.MdiActiveDocument;
+
+            // Draws a circle and zooms to the extents or
+            // limits of the drawing
+            acDoc.SendStringToExecute(acadCommandString, true, false, false);
         }
 
         private static object syncRoot = new object();
@@ -346,7 +396,9 @@ namespace AcadBillOfQuantities.Core
                     if (_viewModelLocator == null)
                     {
                         //ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
+                        SimpleIoc.Default.Reset();
                         SimpleIoc.Default.Register<IGetTotalLengthCommand, GetTotalLengthCommand>();
+                        SimpleIoc.Default.Register<ICreateCategoryPolyline, CreateCategoryPolyline>();
                         _viewModelLocator = new ViewModelLocator();
                     }
                 }
@@ -365,9 +417,9 @@ namespace AcadBillOfQuantities.Core
                     {
                         _mainWindow = new MainWindow()
                         {
-                            DataContext = AcadCommands.ViewModelLocatorInstance.Main,
                             Topmost = true
                         };
+                        _mainWindow.DataContext = AcadCommands.ViewModelLocatorInstance.Main;
                     }
                 }
                 return _mainWindow;
@@ -405,6 +457,16 @@ namespace AcadBillOfQuantities.Core
             public void Execute()
             {
                 AcadCommands.GetTotalLength();
+            }
+        }
+
+        public class CreateCategoryPolyline : ICreateCategoryPolyline
+        {
+            public void Execute(string layerName)
+            {
+                AcadCommands.AddMyLayer(layerName);
+                AcadCommands.SetLayerCurrent(layerName);
+                AcadCommands.SendACommandToAutoCAD("PLINE ");
             }
         }
     }

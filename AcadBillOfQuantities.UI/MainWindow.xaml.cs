@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -39,7 +40,9 @@ namespace AcadBillOfQuantities.UI
                 }), null);
             };
 
-            DataContext = ViewModelLocator.Instance;
+            // if opened from Acad dont assign Datacontext from here
+            if (Assembly.GetEntryAssembly() != null)
+                DataContext = ViewModelLocator.Instance.Main;
         }
     }
 }

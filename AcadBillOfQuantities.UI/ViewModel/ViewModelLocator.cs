@@ -6,12 +6,13 @@
   </Application.Resources>
 
   In the View:
-  DataContext="{Binding Source={StaticResource Locator}, Path=ViewModelName}"
+  DataContext="{Binding Source={StaticResource Locator}, LayerName=ViewModelName}"
 
   You can also use Blend to do all this with the tool's support.
   See http://www.galasoft.ch/mvvm
 */
 
+using System.Reflection;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
 using CommonServiceLocator;

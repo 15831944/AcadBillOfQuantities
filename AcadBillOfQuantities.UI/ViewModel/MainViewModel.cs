@@ -27,6 +27,7 @@ namespace AcadBillOfQuantities.UI.ViewModel
     {
         public ObservableCollection<Category> Categories { get; set; }
         public ICommand ExecuteAcadCommand { get; private set; }
+        public ICommand AddCategoryPolylineCommand { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -39,7 +40,13 @@ namespace AcadBillOfQuantities.UI.ViewModel
             }
             else
             {
-                ExecuteAcadCommand = new RelayCommand(SimpleIoc.Default.GetInstance<IGetTotalLengthCommand>().Execute);
+                AddCategoryPolylineCommand = new RelayCommand<string>(
+                    layerName => CreateCategoryPolyline(layerName));
+                try
+                {
+                    ExecuteAcadCommand = new RelayCommand(
+                        SimpleIoc.Default.GetInstance<IGetTotalLengthCommand>().Execute);
+                } catch { }
                 string thisDir = Directory.GetCurrentDirectory();
                 string configFilePath = Path.Combine(thisDir, "AppSettings.xml");
 
@@ -54,16 +61,29 @@ namespace AcadBillOfQuantities.UI.ViewModel
             }
         }
 
-        private ObservableCollection<Category> GenerateObservableCollection(IEnumerable<XmlCategory> xmlCategories)
+        private void CreateCategoryPolyline(string layerName)
+        {
+            try
+            {
+                SimpleIoc.Default.GetInstance<ICreateCategoryPolyline>().Execute(layerName);
+            } catch { }
+        }
+
+        private ObservableCollection<Category> GenerateObservableCollection(
+            IEnumerable<XmlCategory> xmlCategories,
+            string parentLayerName = "")
         {
             var result = new ObservableCollection<Category>();
             foreach (var cat in xmlCategories)
             {
                 var category = new Category();
                 category.Name = cat.Name;
+                string prefix = string.IsNullOrEmpty(parentLayerName) ? string.Empty : parentLayerName + " - ";
+                category.LayerName = prefix + cat.Name;
                 if (cat.HasSubCategories)
-                    category.SubCategories = GenerateObservableCollection(cat.SubCategories);
-                else category.SubCategories = new ObservableCollection<Category>();
+                    category.Categories = GenerateObservableCollection(cat.SubCategories,
+                        category.LayerName);
+                else category.Categories = new ObservableCollection<Category>();
                 result.Add(category);
             }
 

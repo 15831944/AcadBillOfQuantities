@@ -11,7 +11,16 @@ namespace AcadBillOfQuantities.UI.Model
         void Execute();
     }
 
+    public interface IAcadCommand<T> where T : class
+    {
+        void Execute(T obj);
+    }
+
     public interface IGetTotalLengthCommand : IAcadCommand
+    {
+    }
+
+    public interface ICreateCategoryPolyline : IAcadCommand<string>
     {
     }
 }

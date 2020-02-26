@@ -11,9 +11,10 @@ namespace AcadBillOfQuantities.UI.Model
     public class Category : ObservableObject
     {
         public string Name { get; set; }
+        public string LayerName { get; set; }
         //public char ShortcutKey { get; set; }
-        public ObservableCollection<Category> SubCategories { get; set; }
+        public ObservableCollection<Category> Categories { get; set; }
 
-        public bool HasSubCategories => this.SubCategories.Any();
+        public bool IsLeaf => !this.Categories.Any();
     }
 }
