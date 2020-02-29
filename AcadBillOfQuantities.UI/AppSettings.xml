@@ -1,11 +1,66 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Settings>
-  <Category Name="Fundamenty">
-    <SubCategory Name="Podkłady betonowe">
-      <SubCategory Name="pod ławy i stopy"/>
-      <SubCategory Name="pod płyty posadzek"/>
-    </SubCategory>
+  <Category Name="Roboty Ziemne">
+    <SubCategory Name="Warstwa humusu"/>
+    <SubCategory Name="Wykop pod ławy"/>
+    <SubCategory Name="Wykop po stopy"/>
+    <SubCategory Name="Wykop pod płytę"/>
+    <SubCategory Name="Posadzka na gruncie"/>
+  </Category>
+  <Category Name="Fundamenty i izolacje">
     <SubCategory Name="Ławy fundamentowe"/>
-    <SubCategory Name="Stopy fundamentowe"/>
+    <SubCategory Name="Ściany fundamentowe"/>
+    <SubCategory Name="Hydroizolacja ścian fundamentowcyh"/>
+    <SubCategory Name="Termoizolacja ścian fundamentowych"/>
+  </Category>
+  <Category Name="Roboty żelbetowe">
+    <SubCategory Name="Płyta żelbetowa"/>
+    <SubCategory Name="Sciany żelbetowe"/>
+    <SubCategory Name="Schody żelbetowe"/>
+  </Category>
+  <Category Name="Roboty murowe">
+    <SubCategory Name="Ściany nośne zewnętrzne"/>
+    <SubCategory Name="Ściany nośne wewnętrzne"/>
+    <SubCategory Name="Ściany działowe"/>
+  </Category>
+  <Category Name="Stropodach">
+    <SubCategory Name="Stropodach"/>
+    <SubCategory Name="Kominy"/>
+    <SubCategory Name="Wywinięcia na ścianę"/>
+    <SubCategory Name="Wywinięcia na attykę"/>
+    <SubCategory Name="Koryto odwadniające"/>
+    <SubCategory Name="Ekoboardy"/>
+  </Category>
+  <Category Name="Balkony">
+    <SubCategory Name="Balkony"/>
+    <SubCategory Name="Kapinosy balkonów"/>
+    <SubCategory Name="Wywiniecia na ścianę"/>
+  </Category>
+  <Category Name="Roboty wykończeniowe">
+    <SubCategory Name="Tynki ścienne"/>
+    <SubCategory Name="Tynki sufity"/>
+    <SubCategory Name="Parapety wewnętrzne"/>
+    <SubCategory Name="Parapety zewnętrzne"/>
+    <SubCategory Name="Elewacja lekka mokra"/>
+    <SubCategory Name="Elewacja deska"/>
+    <SubCategory Name="Elewacja obudowa"/>
+    <SubCategory Name="Płyty warstwowe ścienne I"/>
+    <SubCategory Name="Płyty warstwowe ścienne II"/>
+    <SubCategory Name="Płyty warstwowe ścienne III"/>
+    <SubCategory Name="Szpalety okienne"/>
+    <SubCategory Name="Balustrady wewnętrzne"/>
+  </Category>
+  <Category Name="Zagospodarowanie terenu">
+    <SubCategory Name="Krawężniki"/>
+    <SubCategory Name="Kostka"/>
+    <SubCategory Name="Podbudowa pod kostkę"/>
+    <SubCategory Name="Opaski żwirowe"/>
+    <SubCategory Name="Obrzeża trawnikowe"/>
+    <SubCategory Name="Schody zewnętrzne"/>
+  </Category>
+  <Category Name="Elementy zewnętrzne">
+    <SubCategory Name="Mury oporowe"/>
+    <SubCategory Name="Balustrady zewnętrzne"/>
+    <SubCategory Name="Zbiorniki"/>
   </Category>
 </Settings>

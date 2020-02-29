@@ -7,11 +7,29 @@
         xmlns:model="clr-namespace:AcadBillOfQuantities.UI.Model"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="210">
+        Title="MainWindow" Height="450" Width="210"
+        >
+        <Window.Background>
+            <SolidColorBrush>
+                <SolidColorBrush.Color>
+                    <Color A="255" R="76" G="76" B="76"></Color>
+                </SolidColorBrush.Color>
+            </SolidColorBrush>
+        </Window.Background>
         <!--Title="MainWindow" Height="450" Width="200"
         DataContext="{Binding Main, Source={StaticResource Locator}}">-->
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <SolidColorBrush x:Key="background_color">
+            <SolidColorBrush.Color>
+                <Color A="255" R="76" G="76" B="76"></Color>
+            </SolidColorBrush.Color>
+        </SolidColorBrush>
+        <SolidColorBrush x:Key="button_color">
+            <SolidColorBrush.Color>
+                <Color A="0"/>
+            </SolidColorBrush.Color>
+        </SolidColorBrush>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -29,16 +47,18 @@
             <TreeView.Resources>
                 <HierarchicalDataTemplate ItemsSource="{Binding Categories}" DataType="{x:Type model:Category}">
                     <StackPanel Orientation="Horizontal" MouseUp="ExpandNode">
-                        <Button Margin="-25,0,3,0" Content="Add"
+                        <Button Margin="-25,0,3,0"
                                 Visibility="{Binding IsLeaf, Converter={StaticResource BoolToVis}}"
                                 Command="{Binding DataContext.AddCategoryPolylineCommand,
                                     RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
                                 CommandParameter="{Binding LayerName}"
-                                />
-                        <TextBlock Text="{Binding Name}"/>
-                        <Ellipse Visibility="{Binding IsLeaf, Converter={StaticResource BoolToVis}}"
-                            Margin="5,-2,0,0"
-                            Width="10" Height="10" Fill="{Binding Color}"/>
+                                Background="{StaticResource button_color}"
+                                >
+                            <Ellipse Visibility="{Binding IsLeaf, Converter={StaticResource BoolToVis}}"
+                                Margin="0,0,0,0"
+                                Width="12" Height="12" Fill="{Binding Color}"/>
+                        </Button>
+                        <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="Thin"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.Resources>
@@ -48,6 +68,13 @@
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                 </Style>
             </TreeView.ItemContainerStyle>
+        <TreeView.Background>
+            <SolidColorBrush>
+                <SolidColorBrush.Color>
+                    <Color A="255" R="76" G="76" B="76"></Color>
+                </SolidColorBrush.Color>
+            </SolidColorBrush>
+        </TreeView.Background>
         </TreeView>
     </Grid>
 </Window>

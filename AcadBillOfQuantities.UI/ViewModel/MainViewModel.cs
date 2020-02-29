@@ -69,7 +69,7 @@ namespace AcadBillOfQuantities.UI.ViewModel
                     settings = (Settings)serializer.Deserialize(stream);
                 }
 
-                this.Categories = GenerateObservableCollection(settings.Categories);
+                this.Categories = GenerateObservableCollection(settings.Categories, "_");
                 this._hashAlgorithm.Dispose();
             }
         }
@@ -101,7 +101,8 @@ namespace AcadBillOfQuantities.UI.ViewModel
             {
                 var category = new Category();
                 category.Name = cat.Name;
-                string prefix = string.IsNullOrEmpty(parentLayerName) ? string.Empty : parentLayerName + " - ";
+                string delimeter = parentLayerName == "_ " ? string.Empty : " - ";
+                string prefix = string.IsNullOrEmpty(parentLayerName) ? string.Empty : parentLayerName + delimeter;
                 category.LayerName = prefix + cat.Name;
                 if (cat.HasSubCategories)
                     category.Categories = GenerateObservableCollection(cat.SubCategories, category.LayerName);
