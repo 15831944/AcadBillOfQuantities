@@ -19,28 +19,31 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal">
-            <Button Content="Expand all" Command="{Binding ExecuteAcadCommand}"></Button>
-            <Button Content="Copy to clipboard" Command="{Binding GetPolylinesData}"></Button>
+            <Button Content="Expand all" Command="{Binding ExpandAllCommand}"></Button>
+            <Button Content="Collapse all" Command="{Binding CollapseAllCommand}"></Button>
+            <Button Content="To Clipboard" Command="{Binding GetPolylinesDataCommand}"></Button>
         </StackPanel>
-        <TreeView Grid.Row="1" Name="Categories" ItemsSource="{Binding Categories}">
+        <TreeView Grid.Row="1" Name="Categories" ItemsSource="{Binding Categories}"
+            TreeViewItem.Selected="HandleTreeViewItemSelection">
             <TreeView.Resources>
                 <HierarchicalDataTemplate ItemsSource="{Binding Categories}" DataType="{x:Type model:Category}">
-                    <!--<TreeViewItem Header="{Binding Name}">-->
-                    <TreeViewItem>
-                        <TreeViewItem.Header>
-                            <StackPanel Orientation="Horizontal">
-                                <Button Margin="0,0,5,0" Content="Add"
-                                        Visibility="{Binding IsLeaf, Converter={StaticResource BoolToVis}}"
-                                        Command="{Binding DataContext.AddCategoryPolylineCommand,
-                                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
-                                        CommandParameter="{Binding LayerName}"
-                                        />
-                                <TextBlock Text="{Binding Name}"/>
-                            </StackPanel>
-                        </TreeViewItem.Header>
-                    </TreeViewItem>
+                    <StackPanel Orientation="Horizontal" MouseUp="ExpandNode">
+                        <Button Margin="-25,0,3,0" Content="Add"
+                                Visibility="{Binding IsLeaf, Converter={StaticResource BoolToVis}}"
+                                Command="{Binding DataContext.AddCategoryPolylineCommand,
+                                    RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
+                                CommandParameter="{Binding LayerName}"
+                                />
+                        <TextBlock Text="{Binding Name}"/>
+                    </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.Resources>
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}" >
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                </Style>
+            </TreeView.ItemContainerStyle>
         </TreeView>
     </Grid>
 </Window>

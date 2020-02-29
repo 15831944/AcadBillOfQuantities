@@ -44,5 +44,19 @@ namespace AcadBillOfQuantities.UI
             if (Assembly.GetEntryAssembly() != null)
                 DataContext = ViewModelLocator.Instance.Main;
         }
+
+        private void ExpandNode(object sender, MouseButtonEventArgs e)
+        {
+            var item = sender as TreeViewItem;
+            if (!(item is null)) item.IsExpanded = true;
+            e.Handled = true;
+        }
+
+        private void HandleTreeViewItemSelection(object sender, RoutedEventArgs e)
+        {
+            TreeViewItem tvi = e.OriginalSource as TreeViewItem;
+            tvi.IsExpanded = true;
+            e.Handled = true;
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using GalaSoft.MvvmLight;
@@ -26,9 +27,11 @@ namespace AcadBillOfQuantities.UI.ViewModel
     public class MainViewModel : ViewModelBase
     {
         public ObservableCollection<Category> Categories { get; set; }
-        public ICommand ExecuteAcadCommand { get; private set; }
+        public ICommand ExpandAllCommand { get; private set; }
+        public ICommand CollapseAllCommand { get; private set; }
         public ICommand AddCategoryPolylineCommand { get; private set; }
-        public ICommand GetPolylinesData { get; private set; }
+        public ICommand GetPolylinesDataCommand { get; private set; }
+
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -43,13 +46,11 @@ namespace AcadBillOfQuantities.UI.ViewModel
             {
                 AddCategoryPolylineCommand = new RelayCommand<string>(
                     layerName => CreateCategoryPolyline(layerName));
-                GetPolylinesData = new RelayCommand<IEnumerable<string>>(
+                GetPolylinesDataCommand = new RelayCommand<IEnumerable<string>>(
                     layerNames => GetPolylinesDataFromAcad(layerNames));
-                try
-                {
-                    ExecuteAcadCommand = new RelayCommand(
-                        SimpleIoc.Default.GetInstance<IGetTotalLengthCommand>().Execute);
-                } catch { }
+                ExpandAllCommand = new RelayCommand(ExpandAll);
+                CollapseAllCommand = new RelayCommand(CollapseAll);
+
                 string thisDir = Directory.GetCurrentDirectory();
                 string configFilePath = Path.Combine(thisDir, "AppSettings.xml");
 
@@ -100,6 +101,17 @@ namespace AcadBillOfQuantities.UI.ViewModel
             }
 
             return result;
+        }
+
+        private void ExpandAll() => SwitchDeep(true, this.Categories);
+        private void CollapseAll() => SwitchDeep(false, this.Categories);
+        private void SwitchDeep(bool isExpanded, IEnumerable<Category> input = null)
+        {
+            foreach (var i in input)
+            {
+                i.IsExpanded = isExpanded;
+                SwitchDeep(isExpanded, i.Categories);
+            }
         }
     }
 }

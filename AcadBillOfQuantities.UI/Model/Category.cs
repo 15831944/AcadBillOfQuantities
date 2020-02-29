@@ -19,5 +19,12 @@ namespace AcadBillOfQuantities.UI.Model
         public ObservableCollection<Category> Categories { get; set; }
 
         public bool IsLeaf => !this.Categories.Any();
+
+        private bool _isExpanded;
+        public bool IsExpanded
+        {
+            get { return _isExpanded; }
+            set { Set(ref _isExpanded, value); }
+        }
     }
 }
