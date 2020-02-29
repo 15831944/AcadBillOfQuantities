@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using GalaSoft.MvvmLight;
 using System.IO;
+using System.Linq;
 using System.Windows.Input;
 using System.Xml.Serialization;
 using AcadBillOfQuantities.UI.Model;
@@ -75,10 +76,11 @@ namespace AcadBillOfQuantities.UI.ViewModel
 
         private void GetPolylinesDataFromAcad(IEnumerable<string> layersToGet = null)
         {
+            var input = layersToGet ?? this.Categories.SelectMany(c => c.GetLeafs()).Select(c => c.LayerName);
             try
             {
                 var receivedData = SimpleIoc.Default.GetInstance<IGetPlineCollectionsCommand>()
-                    .Execute(layersToGet);
+                    .Execute(input);
             } catch { }
         }
 
