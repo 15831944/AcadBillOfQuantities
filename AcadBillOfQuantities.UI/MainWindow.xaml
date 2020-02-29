@@ -7,7 +7,7 @@
         xmlns:model="clr-namespace:AcadBillOfQuantities.UI.Model"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="200">
+        Title="MainWindow" Height="450" Width="210">
         <!--Title="MainWindow" Height="450" Width="200"
         DataContext="{Binding Main, Source={StaticResource Locator}}">-->
     <Window.Resources>

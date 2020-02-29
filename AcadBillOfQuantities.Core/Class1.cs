@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Media;
 using AcadBillOfQuantities.UI;
 using AcadBillOfQuantities.UI.Model;
 using AcadBillOfQuantities.UI.ViewModel;
@@ -19,6 +21,7 @@ using Autodesk.AutoCAD.GraphicsInterface;
 using CommonServiceLocator;
 using GalaSoft.MvvmLight.Ioc;
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
+using Color = Autodesk.AutoCAD.Colors.Color;
 using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
 
 
@@ -360,7 +363,7 @@ namespace AcadBillOfQuantities.Core
         }
 
         [CommandMethod("CountPolylines")]
-        public static void CountPolylines()
+        public static void CountPolylines(IEnumerable<string> layerNames)
         {
             AcadCommands.ResultDictionary = new Dictionary<string, (int count, double length, double area)>();
             // Get the current document
@@ -391,7 +394,7 @@ namespace AcadBillOfQuantities.Core
                 {
                     //acDocument.Editor.WriteMessage("\n" + acObjId.ObjectClass.DxfName);
                     var pline = acTrans.GetObject(acObjId, OpenMode.ForRead) as Polyline;
-                    if (!(pline is null))
+                    if (!(pline is null) && layerNames.Any(layer => layer == pline.Layer))
                     {
                         if (!AcadCommands.ResultDictionary.ContainsKey(pline.Layer))
                             AcadCommands.ResultDictionary.Add(pline.Layer, (default, default, default));
@@ -507,6 +510,59 @@ namespace AcadBillOfQuantities.Core
             acDoc.SendStringToExecute(acadCommandString, true, false, false);
         }
 
+
+        [CommandMethod("PrepareLayer")]
+        public static void PrepareLayer(string layerName)
+        {
+            // Get the current document and database
+            Document acDoc = Application.DocumentManager.MdiActiveDocument;
+            Database acCurDb = acDoc.Database;
+
+            // Lock the new document
+            using (DocumentLock acLckDoc = acDoc.LockDocument())
+            {
+                // Start a transaction
+                using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
+                {
+                    // Open the Layer table for read
+                    LayerTable acLyrTbl;
+                    acLyrTbl = acTrans.GetObject(acCurDb.LayerTableId,
+                        OpenMode.ForRead) as LayerTable;
+
+                    LayerTableRecord acLyrTblRec;
+
+                    if (!acLyrTbl.Has(layerName))
+                    {
+                        acLyrTblRec = new LayerTableRecord();
+
+                        // Assign the layer a name
+                        acLyrTblRec.Name = layerName;
+
+                        // Upgrade the Layer table for write
+                        if (acLyrTbl.IsWriteEnabled == false) acLyrTbl.UpgradeOpen();
+
+                        // Append the new layer to the Layer table and the transaction
+                        acLyrTbl.Add(acLyrTblRec);
+                        acTrans.AddNewlyCreatedDBObject(acLyrTblRec, true);
+
+                        Color acadColor;
+                        // Define an array of colors for the layers
+                        using (var hashAlgorithm = new SHA1Managed())
+                        {
+                            byte[] rgb = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(layerName)).Take(3).ToArray();
+                            acadColor = Color.FromRgb(rgb[0], rgb[1], rgb[2]);
+                        }
+
+                        // Set the color of the layer
+                        acLyrTblRec.Color = acadColor;
+                    }
+
+                    // Save the changes and dispose of the transaction
+                    acTrans.Commit();
+                }
+            }
+        }
+
         private static object syncRoot = new object();
         private static UI.App _boqApp;
 
@@ -604,7 +660,7 @@ namespace AcadBillOfQuantities.Core
         {
             public void Execute(string layerName)
             {
-                AcadCommands.AddMyLayer(layerName);
+                AcadCommands.PrepareLayer(layerName);
                 AcadCommands.SetLayerCurrent(layerName);
                 AcadCommands.SendACommandToAutoCAD("PLINE ");
             }
@@ -614,7 +670,7 @@ namespace AcadBillOfQuantities.Core
         {
             public Dictionary<string, (int count, double length, double area)> Execute(IEnumerable<string> arg)
             {
-                AcadCommands.CountPolylines();
+                AcadCommands.CountPolylines(arg);
                 return AcadCommands.ResultDictionary;
             }
         }
