@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using GalaSoft.MvvmLight;
 
 namespace AcadBillOfQuantities.UI.Model
@@ -33,22 +34,18 @@ namespace AcadBillOfQuantities.UI.Model
             set { Set(ref _isExpanded, value); }
         }
 
+        private SolidColorBrush _color;
+        public SolidColorBrush Color
+        {
+            get { return _color; }
+            set { Set(ref _color, value); }
+        }
+
         public IEnumerable<Category> GetLeafs()
         {
             var result = this.Categories.Where(c => c.IsLeaf)
                 .Concat(this.Categories.Where(c => !c.IsLeaf).SelectMany(c => c.GetLeafs()));
             result = this.IsLeaf ? result.Append(this) : result;
-
-
-            /*
-            foreach (var cat in this.Categories)
-            {
-                if (!cat.IsLeaf)
-                {
-                    result = result.Concat(cat.GetLeafs());
-                }
-            }
-            */
 
             return result;
         }

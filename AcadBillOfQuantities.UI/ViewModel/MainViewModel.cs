@@ -1,10 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Eventing.Reader;
 using GalaSoft.MvvmLight;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Xml.Serialization;
 using AcadBillOfQuantities.UI.Model;
 using System.Xml;
@@ -27,6 +32,7 @@ namespace AcadBillOfQuantities.UI.ViewModel
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
+        private HashAlgorithm _hashAlgorithm;
         public ObservableCollection<Category> Categories { get; set; }
         public ICommand ExpandAllCommand { get; private set; }
         public ICommand CollapseAllCommand { get; private set; }
@@ -39,6 +45,7 @@ namespace AcadBillOfQuantities.UI.ViewModel
         /// </summary>
         public MainViewModel()
         {
+            _hashAlgorithm = new SHA1Managed();
             if (IsInDesignMode)
             {
                 // Code runs in Blend --> create design time data.
@@ -63,6 +70,7 @@ namespace AcadBillOfQuantities.UI.ViewModel
                 }
 
                 this.Categories = GenerateObservableCollection(settings.Categories);
+                this._hashAlgorithm.Dispose();
             }
         }
 
@@ -96,10 +104,11 @@ namespace AcadBillOfQuantities.UI.ViewModel
                 string prefix = string.IsNullOrEmpty(parentLayerName) ? string.Empty : parentLayerName + " - ";
                 category.LayerName = prefix + cat.Name;
                 if (cat.HasSubCategories)
-                    category.Categories = GenerateObservableCollection(cat.SubCategories,
-                        category.LayerName);
-                else category.Categories = new ObservableCollection<Category>();
+                    category.Categories = GenerateObservableCollection(cat.SubCategories, category.LayerName);
+                byte[] rgb = _hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(category.LayerName)).Take(3).ToArray();
+                category.Color = new SolidColorBrush(Color.FromRgb(rgb[0],rgb[1],rgb[2]));
                 result.Add(category);
+                // TODO: load clors from autocad!!
             }
 
             return result;

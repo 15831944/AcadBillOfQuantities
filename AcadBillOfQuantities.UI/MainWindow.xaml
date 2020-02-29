@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AcadBillOfQuantities.UI"
         xmlns:model="clr-namespace:AcadBillOfQuantities.UI.Model"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="200">
         <!--Title="MainWindow" Height="450" Width="200"
@@ -35,6 +36,9 @@
                                 CommandParameter="{Binding LayerName}"
                                 />
                         <TextBlock Text="{Binding Name}"/>
+                        <Ellipse Visibility="{Binding IsLeaf, Converter={StaticResource BoolToVis}}"
+                            Margin="5,-2,0,0"
+                            Width="10" Height="10" Fill="{Binding Color}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.Resources>
