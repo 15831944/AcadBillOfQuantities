@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AcadBillOfQuantities.Core.ViewModels
+namespace AcadBillOfQuantities.Infrastrucutre
 {
-    class HomeViewModel
+    public class Class1
     {
     }
 }

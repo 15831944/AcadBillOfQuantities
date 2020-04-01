@@ -15,6 +15,7 @@ using AcadBillOfQuantities.UI.Model;
 using System.Xml;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Ioc;
+using AcadBillOfQuantities.Infrastructure.Interfaces;
 
 namespace AcadBillOfQuantities.UI.ViewModel
 {
@@ -101,7 +102,7 @@ namespace AcadBillOfQuantities.UI.ViewModel
             {
                 var category = new Category();
                 category.Name = cat.Name;
-                string delimeter = parentLayerName == "_ " ? string.Empty : " - ";
+                string delimeter = parentLayerName == "_" ? string.Empty : " - ";
                 string prefix = string.IsNullOrEmpty(parentLayerName) ? string.Empty : parentLayerName + delimeter;
                 category.LayerName = prefix + cat.Name;
                 if (cat.HasSubCategories)
