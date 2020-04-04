@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using AcadBillOfQuantities.Infrastructure.Interfaces;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
 
@@ -15,9 +17,24 @@ namespace AcadBillOfQuantities.Core.Commands
 
         public void Execute(IEnumerable<string> layerNames)
         {
-            this.Results = new Dictionary<string, (int count, double length, double area)>();
             // Get the current document
             var acDocument = Application.DocumentManager.MdiActiveDocument;
+
+            // Get the PickFirst selection set
+            PromptSelectionResult acSSPrompt;
+            acSSPrompt = acDocument.Editor.SelectImplied();
+
+            SelectionSet acSSet = null;
+
+            // If the prompt status is OK, objects were selected before
+            // the command was started
+            if (acSSPrompt.Status == PromptStatus.OK)
+            {
+                acSSet = acSSPrompt.Value;
+            }
+
+            this.Results = new Dictionary<string, (int count, double length, double area)>();
+            // Get the current document
 
             // Get the current document and database, and start a transaction
             Database acCurDb = acDocument.Database;
@@ -40,7 +57,14 @@ namespace AcadBillOfQuantities.Core.Commands
 
                 // Step through each object in Model space and
                 // display the type of object found
-                foreach (ObjectId acObjId in acBlkTblRec)
+                IEnumerable<ObjectId> iterator = acSSet?.GetObjectIds();
+                if (iterator is null)
+                {
+                    var objectIds = new List<ObjectId>();
+                    foreach (ObjectId acObjId in acBlkTblRec) objectIds.Add(acObjId);
+                    iterator = objectIds;
+                }
+                foreach (ObjectId acObjId in iterator)
                 {
                     //acDocument.Editor.WriteMessage("\n" + acObjId.ObjectClass.DxfName);
                     var pline = acTrans.GetObject(acObjId, OpenMode.ForRead) as Polyline;
@@ -55,7 +79,8 @@ namespace AcadBillOfQuantities.Core.Commands
                     }
                 }
 
-                string userInfo = "Count of polylines per layer:\r\n";
+                string userInfo = acSSet is null ? string.Empty : "[Selection only]\r\n\r\n";
+                userInfo += "Count of polylines per layer:\r\n";
                 userInfo += "Category\tCount\tLength\tArea\r\n";
                 foreach (var entry in this.Results)
                 {
