@@ -24,6 +24,6 @@ Thanks to this mechanism colors don't have to be defined manually
 in configuration file and are always the same at each runtime.
 
 In order to export data to clipboard simply press "To Clipboard" button.
-Export also works on selection if you don't want all data to be retrieved.
+Export also works on selection if you don't want all data to be retrieved.  
 ![](doc/introduction.gif)
 
